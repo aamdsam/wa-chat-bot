@@ -6,7 +6,8 @@ import makeWASocket, { AnyMessageContent, delay, DisconnectReason, makeInMemoryS
 
 
 import {
-	checkOutBox
+	checkOutBox,
+	checkInbox
 } from './Modules/Messages'
 
 dotenv.config();
@@ -37,7 +38,8 @@ async function connectToWhatsApp () {
 		const msg = m.messages[0]
         console.log(JSON.stringify(m))
         
-		if(!msg.key.fromMe && m.type === 'notify') {						
+		if(!msg.key.fromMe && m.type === 'notify') {	
+			checkInbox(sock, m)					
 			// await sock.sendMessage(msg.key.remoteJid!, { text: 'Hello there!' })
 		}
         
