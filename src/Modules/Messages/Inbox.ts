@@ -62,12 +62,27 @@ export async function checkInbox(sock:any, chat:any) {
     
     // apabila type pesan conversation
     if (messageType === 'conversation') {
-        const text = messageContent.conversation
+        const text = messageContent.conversation;
         let content='';
         
-        if (text.toLowerCase() ==='info'){
+        // apabila ada pesan masuk isi text info
+        const messageText = text.toLowerCase();
+        if ( messageText === 'info'){
             content = `sender id: ${sender}, name: ${user}`
-            await sock.sendMessage(sender, { text: content })
+            await sock.sendMessage(sender, { text: content });
+            return
         }
+
+        // cek pesan apakah ada di template pesan
+        const checkTemplate = await getMessageFromTemplate(messageText);
+        
+        // apabila ada maka kirim pesan jawaban sesuai template
+        if (checkTemplate.data.status==='success'){
+            const messageContentReply = checkTemplate.data.data.message;
+            await sock.sendMessage(sender, { text: messageContentReply });
+            return
+        }
+
+        
     }
 }
