@@ -1,7 +1,7 @@
 
 const axios = require('axios')
 
-
+// fungsi ambil pesan dari API data template
 export async function getMessageFromTemplate(msg:string) {
     let messages:any=[];
     try {
@@ -15,12 +15,41 @@ export async function getMessageFromTemplate(msg:string) {
         }
 
         messages = await axios.get(process.env.API_URL+'/message/template',options); 
-        console.log(messages)
     } catch (error) {
         console.error(error)
     }
     return messages
 }
+
+// fungsi ambil pesan dari open AI
+export async function getMessageFromOpenAi(msg:string) {
+    let messages:any=[];
+    try {
+        const options = {
+            headers: {
+                Authorization: "Bearer "+process.env.OPEN_API_TOKEN
+            }
+        }
+
+        const body = {
+            model: "text-davinci-003",
+            prompt: msg,
+            max_tokens: 4000,
+            temperature: 0,
+            top_p: 1,
+            frequency_penalty: 0.5,
+            presence_penalty: 0
+        }
+
+        messages = await axios.post(process.env.OPEN_API_URL+'/completions',body,options); 
+    } catch (error) {
+        console.error(error)
+    }
+    return messages
+}
+
+
+
 
 export async function checkMessage(sender:string, type:string, input:string, desc:string) {
     let messages:any=[];
@@ -58,7 +87,6 @@ export async function checkInbox(sock:any, chat:any) {
     const sender = m.key.remoteJid
     const user = m.pushName
     const messageType = Object.keys(messageContent)[0]
-    console.log({messageType});
     
     // apabila type pesan conversation
     if (messageType === 'conversation') {
@@ -83,6 +111,17 @@ export async function checkInbox(sock:any, chat:any) {
             return
         }
 
+
+        // cek data dari open AI
+        const checkOpenAi = await getMessageFromOpenAi(messageText);
         
+        // apabila ada maka kirim pesan jawaban sesuai template
+        if (checkOpenAi.status===200){
+            const messageContentReply = checkOpenAi.data.choices[0].text;
+            await sock.sendMessage(sender, { text: messageContentReply });
+            return
+        }
+
+
     }
 }
