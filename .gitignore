@@ -1,0 +1,17 @@
+node_modules
+auth_info*.json
+output.csv
+*/.DS_Store
+.DS_Store
+.env
+browser-messages.json
+decoded-ws.json
+dist
+docs
+browser-token.json
+Proxy
+messages*.json
+baileys_store.json
+package-lock.json
+yarn.lock
+auth_info_baileys
