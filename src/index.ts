@@ -4,9 +4,12 @@ import { Boom } from '@hapi/boom'
 import P from 'pino'
 import makeWASocket, { AnyMessageContent, delay, DisconnectReason, makeInMemoryStore, useMultiFileAuthState } from '@adiwajshing/baileys'
 
+
+import {
+	checkOutBox
+} from './Modules/Messages'
+
 dotenv.config();
-
-
 
 async function connectToWhatsApp () {
 	const { state, saveCreds } = await useMultiFileAuthState('auth_info_baileys')
@@ -34,9 +37,9 @@ async function connectToWhatsApp () {
 		const msg = m.messages[0]
         console.log(JSON.stringify(m))
         
-		// if(!msg.key.fromMe && m.type === 'notify') {			
-		// 	await sock.sendMessage(msg.key.remoteJid, { text: 'Hello there!' })
-		// }
+		if(!msg.key.fromMe && m.type === 'notify') {						
+			// await sock.sendMessage(msg.key.remoteJid!, { text: 'Hello there!' })
+		}
         
 	})
 
@@ -54,9 +57,13 @@ async function connectToWhatsApp () {
         }
     })
 
+	// cek data api untuk kirim notifikasi
+	setTimeout(() => {
+		checkOutBox(sock)
+	}, 10000);
+
 
     sock.ev.on ('creds.update', saveCreds);
-
     return sock
 }
 
